@@ -293,9 +293,9 @@
 
 <div id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  let supabaseClient = null;
+  let API = '';
+  let AKEY = '';
   let state = { page: 1, total: 0, pages: 0, limit: 20 }
   let debounceTimer = null
 
@@ -306,23 +306,26 @@
     if (!key || !url) { showError('Preencha a URL do Supabase e a Chave.'); return }
 
     try {
-      supabaseClient = window.supabase.createClient(url, key);
-      
-      // Test connection
-      const { error } = await supabaseClient.from('waitlist').select('id').limit(1);
-      if (error) throw error;
+      const res = await fetch(`${url}/rest/v1/waitlist?select=id&limit=1`, {
+        headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+      });
+      if (!res.ok) throw new Error('Erro de conexão ou chave inválida');
 
+      API = url;
+      AKEY = key;
       document.getElementById('login-screen').style.display = 'none'
       document.getElementById('app').style.display = 'block'
       document.getElementById('api-url-display').textContent = url
       loadAll()
     } catch (e) {
+      console.error('Erro no login:', e);
       showError('Chave incorreta ou sem permissão de leitura.')
     }
   }
 
   function doLogout() {
-    supabaseClient = null;
+    API = '';
+    AKEY = '';
     document.getElementById('login-screen').style.display = 'flex'
     document.getElementById('app').style.display = 'none'
     document.getElementById('key-input').value = ''
@@ -347,8 +350,11 @@
   async function loadAll() {
     document.getElementById('last-updated').textContent = 'Atualizando...'
     try {
-      const { data, error } = await supabaseClient.from('waitlist').select('*');
-      if (error) throw error;
+      const res = await fetch(`${API}/rest/v1/waitlist?select=*`, {
+        headers: { 'apikey': AKEY, 'Authorization': `Bearer ${AKEY}` }
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
 
       let providers = 0, clients = 0;
       let cityCounts = {}, dayCounts = {};
@@ -418,21 +424,25 @@
       '<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>'
 
     try {
-      let query = supabaseClient.from('waitlist').select('*', { count: 'exact' })
-      
-      if (type) query = query.eq('user_type', type);
-      if (city) query = query.ilike('city', `%${city}%`);
-      if (search) query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+      let queryUrl = `${API}/rest/v1/waitlist?select=*`;
+      if (type) queryUrl += `&user_type=eq.${encodeURIComponent(type)}`;
+      if (city) queryUrl += `&city=ilike.*${encodeURIComponent(city)}*`;
+      if (search) queryUrl += `&or=(name.ilike.*${encodeURIComponent(search)}*,email.ilike.*${encodeURIComponent(search)}*)`;
       
       const from = (page - 1) * state.limit;
-      const to = from + state.limit - 1;
-      query = query.order('created_at', { ascending: false }).range(from, to);
+      queryUrl += `&order=created_at.desc&limit=${state.limit}&offset=${from}`;
 
-      const { data, error, count } = await query;
-      if (error) throw error;
+      const res = await fetch(queryUrl, {
+        headers: { 'apikey': AKEY, 'Authorization': `Bearer ${AKEY}`, 'Prefer': 'count=exact' }
+      });
+      if (!res.ok) throw new Error();
 
-      state.total = count || 0;
-      state.pages = Math.ceil(state.total / state.limit);
+      const countHeader = res.headers.get('content-range');
+      const total = countHeader ? parseInt(countHeader.split('/')[1]) : 0;
+      const data = await res.json();
+
+      state.total = total || 0;
+      state.pages = Math.ceil(state.total / state.limit) || 1;
       
       renderLeadsTable({ data, total: state.total, page, pages: state.pages })
     } catch (e) { toast('Erro ao carregar leads.') }
@@ -503,8 +513,11 @@
   async function exportCSV() {
     toast('Preparando exportação...')
     try {
-      const { data, error } = await supabaseClient.from('waitlist').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
+      const res = await fetch(`${API}/rest/v1/waitlist?select=*&order=created_at.desc`, {
+        headers: { 'apikey': AKEY, 'Authorization': `Bearer ${AKEY}` }
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
       
       const header = 'ID,Nome,Email,Telefone,Cidade,Tipo,Categoria,Origem,Cadastrado em'
       const csv = [
