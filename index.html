@@ -691,7 +691,12 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const supabaseUrl = 'https://dvnoecxqppxsoyhagwjp.supabase.co';
+  const supabaseKey = 'sb_publishable_syfkrVAyzcPoTrdu1D8o7Q_He0lE_ER';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
   // Nav scroll effect
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
@@ -752,16 +757,14 @@
     delete data.category_custom;
 
     try {
-      const res = await fetch('http://localhost:3001/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+      const { error } = await supabase.from('waitlist').insert([data]);
       
-      const result = await res.json();
-      
-      if (!res.ok) {
-        alert(result.error || 'Erro ao realizar cadastro.');
+      if (error) {
+        if (error.code === '23505') {
+          alert('Este e-mail já está na lista de espera.');
+        } else {
+          alert('Erro ao realizar cadastro: ' + error.message);
+        }
         btnSubmit.disabled = false;
         btnSubmit.textContent = 'Quero acesso antecipado →';
         return;

@@ -178,12 +178,12 @@
   <div class="login-card">
     <div class="login-logo">Próximo</div>
     <div class="login-sub">Admin · Waitlist Dashboard</div>
-    <input class="login-input" type="password" id="key-input" placeholder="Chave de admin" onkeydown="if(event.key==='Enter') doLogin()" />
+    <input class="login-input" type="password" id="key-input" placeholder="Supabase Key (Anon ou Service Role)" onkeydown="if(event.key==='Enter') doLogin()" />
     <div id="api-url-wrap" style="margin-bottom:12px">
-      <input class="login-input" type="text" id="api-url-input" placeholder="URL da API (ex: http://localhost:3001)" style="margin-bottom:0" />
+      <input class="login-input" type="text" id="api-url-input" placeholder="Supabase URL (https://...)" style="margin-bottom:0" />
     </div>
     <button class="login-btn" onclick="doLogin()">Entrar</button>
-    <div class="login-error" id="login-error">Chave incorreta ou API indisponível.</div>
+    <div class="login-error" id="login-error">Chave incorreta ou sem permissão de leitura.</div>
   </div>
 </div>
 
@@ -293,34 +293,36 @@
 
 <div id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  let API   = ''
-  let AKEY  = ''
-  let state = { page: 1, total: 0, pages: 0 }
+  let supabase = null;
+  let state = { page: 1, total: 0, pages: 0, limit: 20 }
   let debounceTimer = null
 
   // ─── Auth ──────────────────────────────────────────────────────────────────
   async function doLogin() {
     const key = document.getElementById('key-input').value.trim()
     const url = document.getElementById('api-url-input').value.trim().replace(/\/$/, '')
-    if (!key || !url) { showError('Preencha a URL da API e a chave de admin.'); return }
+    if (!key || !url) { showError('Preencha a URL do Supabase e a Chave.'); return }
 
     try {
-      const res = await fetch(`${url}/admin/stats`, { headers: { 'x-admin-key': key } })
-      if (!res.ok) { showError('Chave incorreta ou API indisponível.'); return }
-      API  = url
-      AKEY = key
+      supabase = supabase.createClient(url, key);
+      
+      // Test connection
+      const { error } = await supabase.from('waitlist').select('id').limit(1);
+      if (error) throw error;
+
       document.getElementById('login-screen').style.display = 'none'
       document.getElementById('app').style.display = 'block'
       document.getElementById('api-url-display').textContent = url
       loadAll()
     } catch (e) {
-      showError('Não foi possível conectar à API. Verifique a URL.')
+      showError('Chave incorreta ou sem permissão de leitura.')
     }
   }
 
   function doLogout() {
-    API = ''; AKEY = ''
+    supabase = null;
     document.getElementById('login-screen').style.display = 'flex'
     document.getElementById('app').style.display = 'none'
     document.getElementById('key-input').value = ''
@@ -345,21 +347,37 @@
   async function loadAll() {
     document.getElementById('last-updated').textContent = 'Atualizando...'
     try {
-      const res  = await fetch(`${API}/admin/stats`, { headers: { 'x-admin-key': AKEY } })
-      const data = await res.json()
-      renderStats(data)
-      renderChart(data.by_day)
-      renderCities(data.by_city)
+      const { data, error } = await supabase.from('waitlist').select('*');
+      if (error) throw error;
+
+      let providers = 0, clients = 0;
+      let cityCounts = {}, dayCounts = {};
+
+      data.forEach(row => {
+        if (row.user_type === 'provider') providers++;
+        if (row.user_type === 'client') clients++;
+        if (row.city) cityCounts[row.city] = (cityCounts[row.city] || 0) + 1;
+        if (row.created_at) {
+          const day = row.created_at.split('T')[0];
+          dayCounts[day] = (dayCounts[day] || 0) + 1;
+        }
+      });
+
+      const by_city = Object.entries(cityCounts).map(([city, count]) => ({ city, count })).sort((a,b) => b.count - a.count);
+      const by_day = Object.entries(dayCounts).map(([day, count]) => ({ day, count })).sort((a,b) => a.day.localeCompare(b.day));
+
+      renderStats({ total: data.length, providers, clients, by_city });
+      renderChart(by_day);
+      renderCities(by_city);
+
       document.getElementById('last-updated').textContent = `Atualizado às ${new Date().toLocaleTimeString('pt-BR')}`
     } catch (e) { toast('Erro ao carregar stats.') }
   }
 
   function renderStats(data) {
-    const providers = data.by_type.find(t => t.user_type === 'provider')?.count || 0
-    const clients   = data.by_type.find(t => t.user_type === 'client')?.count || 0
     document.getElementById('s-total').textContent     = Number(data.total).toLocaleString('pt-BR')
-    document.getElementById('s-providers').textContent = Number(providers).toLocaleString('pt-BR')
-    document.getElementById('s-clients').textContent   = Number(clients).toLocaleString('pt-BR')
+    document.getElementById('s-providers').textContent = Number(data.providers).toLocaleString('pt-BR')
+    document.getElementById('s-clients').textContent   = Number(data.clients).toLocaleString('pt-BR')
     document.getElementById('s-cities').textContent    = data.by_city.length
   }
 
@@ -369,10 +387,10 @@
     const max = Math.max(...byDay.map(d => Number(d.count)), 1)
     el.innerHTML = byDay.map(d => {
       const pct = Math.max(4, Math.round((Number(d.count) / max) * 100))
-      const day = new Date(d.day).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
-      return `<div class="chart-bar-wrap" title="${day}: ${d.count} cadastros">
+      const [y,m,day] = d.day.split('-')
+      return `<div class="chart-bar-wrap" title="${day}/${m}: ${d.count} cadastros">
         <div class="chart-bar" style="height:${pct}%"></div>
-        <div class="chart-label">${day.split('/').slice(0,1)[0]}/${day.split('/')[1]}</div>
+        <div class="chart-label">${day}/${m}</div>
       </div>`
     }).join('')
   }
@@ -392,23 +410,31 @@
   // ─── Leads table ──────────────────────────────────────────────────────────
   async function loadLeads(page = 1) {
     state.page = page
-    const search = document.getElementById('f-search').value
+    const search = document.getElementById('f-search').value.trim()
     const type   = document.getElementById('f-type').value
-    const city   = document.getElementById('f-city').value
-
-    const params = new URLSearchParams({ page, limit: 20 })
-    if (search) params.set('search', search)
-    if (type)   params.set('type', type)
-    if (city)   params.set('city', city)
+    const city   = document.getElementById('f-city').value.trim()
 
     document.getElementById('leads-tbody').innerHTML =
       '<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>'
 
     try {
-      const res  = await fetch(`${API}/admin/waitlist?${params}`, { headers: { 'x-admin-key': AKEY } })
-      const data = await res.json()
-      state.total = data.total; state.pages = data.pages
-      renderLeadsTable(data)
+      let query = supabase.from('waitlist').select('*', { count: 'exact' })
+      
+      if (type) query = query.eq('user_type', type);
+      if (city) query = query.ilike('city', `%${city}%`);
+      if (search) query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+      
+      const from = (page - 1) * state.limit;
+      const to = from + state.limit - 1;
+      query = query.order('created_at', { ascending: false }).range(from, to);
+
+      const { data, error, count } = await query;
+      if (error) throw error;
+
+      state.total = count || 0;
+      state.pages = Math.ceil(state.total / state.limit);
+      
+      renderLeadsTable({ data, total: state.total, page, pages: state.pages })
     } catch (e) { toast('Erro ao carregar leads.') }
   }
 
@@ -441,8 +467,9 @@
   }
 
   function renderPagination(page, pages, total) {
-    const start  = (page - 1) * 20 + 1
-    const end    = Math.min(page * 20, total)
+    if (total === 0) { document.getElementById('page-info').textContent = '—'; document.getElementById('page-btns').innerHTML = ''; return; }
+    const start  = (page - 1) * state.limit + 1
+    const end    = Math.min(page * state.limit, total)
     document.getElementById('page-info').textContent = `${start}–${end} de ${total.toLocaleString('pt-BR')}`
 
     const btns = document.getElementById('page-btns')
@@ -476,8 +503,19 @@
   async function exportCSV() {
     toast('Preparando exportação...')
     try {
-      const res  = await fetch(`${API}/admin/export`, { headers: { 'x-admin-key': AKEY } })
-      const blob = await res.blob()
+      const { data, error } = await supabase.from('waitlist').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      
+      const header = 'ID,Nome,Email,Telefone,Cidade,Tipo,Categoria,Origem,Cadastrado em'
+      const csv = [
+        header,
+        ...data.map(r =>
+          [r.id, `"${r.name}"`, r.email, r.phone || '', `"${r.city}"`,
+           r.user_type, r.category || '', r.source || '', fmtDate(r.created_at)].join(',')
+        ),
+      ].join('\n')
+
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       const url  = URL.createObjectURL(blob)
       const a    = document.createElement('a')
       a.href = url; a.download = `proximo-waitlist-${Date.now()}.csv`; a.click()
@@ -517,8 +555,8 @@
   }
 
   // Auto-focus
-  document.getElementById('api-url-input').value = localStorage.getItem('px_api') || 'http://localhost:3001'
-  document.getElementById('api-url-input').addEventListener('change', e => localStorage.setItem('px_api', e.target.value))
+  document.getElementById('api-url-input').value = localStorage.getItem('px_supa_url') || 'https://dvnoecxqppxsoyhagwjp.supabase.co'
+  document.getElementById('api-url-input').addEventListener('change', e => localStorage.setItem('px_supa_url', e.target.value))
 </script>
 </body>
 </html>
