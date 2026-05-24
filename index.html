@@ -695,7 +695,7 @@
 <script>
   const supabaseUrl = 'https://dvnoecxqppxsoyhagwjp.supabase.co';
   const supabaseKey = 'sb_publishable_syfkrVAyzcPoTrdu1D8o7Q_He0lE_ER';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
   // Nav scroll effect
   const navbar = document.getElementById('navbar');
@@ -757,7 +757,7 @@
     delete data.category_custom;
 
     try {
-      const { error } = await supabase.from('waitlist').insert([data]);
+      const { error } = await supabaseClient.from('waitlist').insert([data]);
       
       if (error) {
         if (error.code === '23505') {

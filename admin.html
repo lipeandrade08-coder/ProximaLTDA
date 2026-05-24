@@ -295,7 +295,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  let supabase = null;
+  let supabaseClient = null;
   let state = { page: 1, total: 0, pages: 0, limit: 20 }
   let debounceTimer = null
 
@@ -306,10 +306,10 @@
     if (!key || !url) { showError('Preencha a URL do Supabase e a Chave.'); return }
 
     try {
-      supabase = supabase.createClient(url, key);
+      supabaseClient = window.supabase.createClient(url, key);
       
       // Test connection
-      const { error } = await supabase.from('waitlist').select('id').limit(1);
+      const { error } = await supabaseClient.from('waitlist').select('id').limit(1);
       if (error) throw error;
 
       document.getElementById('login-screen').style.display = 'none'
@@ -322,7 +322,7 @@
   }
 
   function doLogout() {
-    supabase = null;
+    supabaseClient = null;
     document.getElementById('login-screen').style.display = 'flex'
     document.getElementById('app').style.display = 'none'
     document.getElementById('key-input').value = ''
@@ -347,7 +347,7 @@
   async function loadAll() {
     document.getElementById('last-updated').textContent = 'Atualizando...'
     try {
-      const { data, error } = await supabase.from('waitlist').select('*');
+      const { data, error } = await supabaseClient.from('waitlist').select('*');
       if (error) throw error;
 
       let providers = 0, clients = 0;
@@ -418,7 +418,7 @@
       '<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>'
 
     try {
-      let query = supabase.from('waitlist').select('*', { count: 'exact' })
+      let query = supabaseClient.from('waitlist').select('*', { count: 'exact' })
       
       if (type) query = query.eq('user_type', type);
       if (city) query = query.ilike('city', `%${city}%`);
@@ -503,7 +503,7 @@
   async function exportCSV() {
     toast('Preparando exportação...')
     try {
-      const { data, error } = await supabase.from('waitlist').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabaseClient.from('waitlist').select('*').order('created_at', { ascending: false });
       if (error) throw error;
       
       const header = 'ID,Nome,Email,Telefone,Cidade,Tipo,Categoria,Origem,Cadastrado em'
