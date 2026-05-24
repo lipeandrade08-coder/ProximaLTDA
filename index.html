@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Próximo — O talento da sua cidade, na palma da sua mão</title>
+  <meta name="description" content="Encontre eletricistas, costureiras, professores e centenas de profissionais da sua cidade. Sem intermediários. Sem taxas absurdas. Próximo." />
+  <meta property="og:title" content="Próximo — Talentos locais, onde você está" />
+  <meta property="og:description" content="O marketplace hiperlocal que conecta talentos do interior do Brasil com quem precisa. Cadastre-se na lista de espera." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0B6E4F" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #0B6E4F;
+      --green-mid: #1A9B6C;
+      --green-light: #E8F5EF;
+      --green-pale: #F2FAF6;
+      --gold: #C8962A;
+      --gold-light: #FDF5E6;
+      --dark: #0D1B13;
+      --dark-2: #152A1E;
+      --text: #1A2E23;
+      --text-2: #3D5A4A;
+      --text-3: #6B8A79;
+      --border: rgba(11,110,79,.12);
+      --white: #FFFFFF;
+      --radius: 14px;
+      --radius-lg: 20px;
+      --shadow: 0 2px 24px rgba(11,110,79,.10);
+      --shadow-lg: 0 8px 48px rgba(11,110,79,.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 68px;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow .3s;
+    }
+    nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,.06); }
+    .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .nav-logo-mark {
+      width: 36px; height: 36px; background: var(--green);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .nav-logo-mark img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-logo-name { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--green); letter-spacing: -.4px; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text-2); font-size: 14px; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--green); }
+    .nav-cta {
+      padding: 9px 22px; background: var(--green); color: white;
+      border-radius: 9px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: all .2s; white-space: nowrap;
+    }
+    .nav-cta:hover { background: var(--green-mid); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(11,110,79,.25); }
+    .nav-mobile-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      background: var(--dark);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 100px 5% 80px;
+      position: relative; overflow: hidden;
+      text-align: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(26,155,108,.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border: 1px solid rgba(26,155,108,.35);
+      border-radius: 100px; background: rgba(26,155,108,.08);
+      color: #7DEBB8; font-size: 13px; font-weight: 600;
+      letter-spacing: .3px; margin-bottom: 28px;
+      animation: fadeUp .6s ease both;
+    }
+    .hero-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: #7DEBB8; display: inline-block; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+    .hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(40px, 6.5vw, 76px);
+      font-weight: 800; line-height: 1.07;
+      color: white; letter-spacing: -2.5px;
+      max-width: 900px; margin: 0 auto 20px;
+      animation: fadeUp .6s .1s ease both;
+    }
+    .hero h1 em { font-style: normal; color: #7DEBB8; }
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px); color: rgba(255,255,255,.6);
+      max-width: 560px; margin: 0 auto 44px; line-height: 1.6;
+      animation: fadeUp .6s .2s ease both;
+    }
+    .hero-ctas {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp .6s .3s ease both;
+    }
+    .btn-primary {
+      padding: 15px 32px; background: var(--green);
+      color: white; border-radius: 12px; font-size: 15px; font-weight: 600;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all .22s; display: inline-flex; align-items: center; gap: 8px;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--green-mid); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(11,110,79,.35); }
+    .btn-secondary {
+      padding: 15px 32px; background: rgba(255,255,255,.08);
+      color: white; border-radius: 12px; font-size: 15px; font-weight: 600;
+      text-decoration: none; border: 1px solid rgba(255,255,255,.18); cursor: pointer;
+      transition: all .22s; display: inline-flex; align-items: center; gap: 8px;
+      backdrop-filter: blur(8px);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,.14); transform: translateY(-2px); }
+    .hero-stats {
+      display: flex; gap: 40px; margin-top: 64px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp .6s .4s ease both;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-val { font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 700; color: white; letter-spacing: -1px; line-height: 1; }
+    .hero-stat-label { font-size: 13px; color: rgba(255,255,255,.45); margin-top: 4px; }
+    .hero-divider { width: 1px; background: rgba(255,255,255,.1); height: 48px; align-self: center; }
+    .hero-scroll {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: rgba(255,255,255,.3); font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .hero-scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, rgba(255,255,255,.3), transparent); animation: scrollLine 2s infinite; }
+    @keyframes scrollLine { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 51%{transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ─── SECTIONS ─── */
+    section { padding: 96px 5%; }
+    .container { max-width: 1120px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 1.8px;
+      text-transform: uppercase; color: var(--green); margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Sora', sans-serif; font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 700; letter-spacing: -1.2px; line-height: 1.15;
+      color: var(--text); margin-bottom: 16px; max-width: 640px;
+    }
+    .section-sub { font-size: 17px; color: var(--text-2); max-width: 560px; line-height: 1.65; }
+    .section-header { margin-bottom: 56px; }
+    .section-header.center { text-align: center; }
+    .section-header.center .section-title,
+    .section-header.center .section-sub { margin-left: auto; margin-right: auto; }
+
+    /* ─── PROBLEMA ─── */
+    .problema { background: var(--green-pale); }
+    .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+    .pain-card {
+      background: white; border-radius: var(--radius); padding: 28px 26px;
+      border: 1px solid var(--border); position: relative; overflow: hidden;
+    }
+    .pain-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--green), var(--green-mid));
+    }
+    .pain-icon { font-size: 28px; margin-bottom: 14px; }
+    .pain-card h3 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .pain-card p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+    .pain-highlight { color: #B02020; font-weight: 600; }
+
+    /* ─── COMO FUNCIONA ─── */
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; position: relative; }
+    .steps-grid::before {
+      content: '';
+      position: absolute; top: 32px; left: calc(16.6% + 32px); right: calc(16.6% + 32px); height: 1px;
+      background: linear-gradient(90deg, var(--green), var(--green-mid), var(--green));
+      opacity: .25;
+    }
+    .step { text-align: center; }
+    .step-num {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--green); color: white;
+      font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; position: relative; z-index: 1;
+      box-shadow: 0 0 0 8px var(--green-light);
+    }
+    .step h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .step p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+
+    /* ─── CATEGORIAS ─── */
+    .categorias { background: var(--dark); }
+    .categorias .section-title { color: white; }
+    .categorias .section-sub { color: rgba(255,255,255,.55); }
+    .categorias .section-label { color: #7DEBB8; }
+    .cats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .cat-card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius); padding: 22px 16px; text-align: center;
+      cursor: default; transition: all .2s;
+    }
+    .cat-card:hover { background: rgba(26,155,108,.12); border-color: rgba(26,155,108,.3); transform: translateY(-3px); }
+    .cat-icon { font-size: 32px; margin-bottom: 10px; }
+    .cat-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.8); }
+    .cat-count { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 3px; }
+    .cats-more {
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(26,155,108,.08); border: 1px dashed rgba(26,155,108,.3);
+      border-radius: var(--radius); padding: 22px 16px; text-align: center;
+    }
+    .cats-more span { font-size: 13px; color: #7DEBB8; font-weight: 600; }
+
+    /* ─── DIFERENCIAIS ─── */
+    .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .diff-visual {
+      background: var(--green-pale); border-radius: var(--radius-lg);
+      padding: 36px; border: 1px solid var(--border);
+    }
+    .diff-list { display: flex; flex-direction: column; gap: 28px; }
+    .diff-item { display: flex; gap: 16px; align-items: flex-start; }
+    .diff-item-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--green-light); border: 1px solid rgba(11,110,79,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .diff-item h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .diff-item p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+    .profile-mock {
+      background: white; border-radius: var(--radius); padding: 20px;
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .profile-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .profile-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green), var(--green-mid));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 20px; flex-shrink: 0;
+    }
+    .profile-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .profile-role { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+    .verified-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--green-light); color: var(--green);
+      font-size: 11px; font-weight: 700; padding: 3px 9px;
+      border-radius: 100px; margin-top: 4px; border: 1px solid rgba(11,110,79,.2);
+    }
+    .profile-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 16px 0; }
+    .pstat { background: var(--green-pale); border-radius: 8px; padding: 10px; text-align: center; }
+    .pstat-val { font-size: 18px; font-weight: 700; color: var(--green); line-height: 1; }
+    .pstat-lbl { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+    .stars { color: #C8962A; font-size: 14px; letter-spacing: 2px; }
+    .reviews { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+    .btn-hire {
+      width: 100%; padding: 12px; background: var(--green); color: white;
+      border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; margin-top: 14px; transition: all .2s;
+    }
+    .btn-hire:hover { background: var(--green-mid); }
+
+    /* ─── FORM / CTA ─── */
+    .waitlist { background: var(--dark); padding: 96px 5%; }
+    .waitlist-inner {
+      max-width: 600px; margin: 0 auto; text-align: center;
+    }
+    .waitlist h2 {
+      font-family: 'Sora', sans-serif; font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800; color: white; letter-spacing: -1.5px; margin-bottom: 14px;
+    }
+    .waitlist h2 em { font-style: normal; color: #7DEBB8; }
+    .waitlist p { font-size: 16px; color: rgba(255,255,255,.55); margin-bottom: 40px; line-height: 1.6; }
+    .form-type-toggle {
+      display: flex; background: rgba(255,255,255,.06); border-radius: 12px;
+      padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,.08);
+    }
+    .toggle-btn {
+      flex: 1; padding: 10px; background: transparent; border: none;
+      color: rgba(255,255,255,.5); font-size: 14px; font-weight: 500;
+      border-radius: 9px; cursor: pointer; transition: all .2s;
+    }
+    .toggle-btn.active { background: var(--green); color: white; font-weight: 600; }
+    .waitlist-form { display: flex; flex-direction: column; gap: 12px; }
+    .form-row { display: flex; gap: 12px; }
+    .form-input {
+      flex: 1; padding: 14px 18px; background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+      color: white; font-size: 15px; font-family: inherit; outline: none;
+      transition: all .2s;
+    }
+    .form-input::placeholder { color: rgba(255,255,255,.3); }
+    .form-input:focus { border-color: rgba(26,155,108,.5); background: rgba(255,255,255,.09); box-shadow: 0 0 0 3px rgba(26,155,108,.1); }
+    .form-select {
+      flex: 1; padding: 14px 18px; background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+      color: rgba(255,255,255,.7); font-size: 15px; font-family: inherit;
+      outline: none; cursor: pointer; appearance: none;
+    }
+    .form-select option { background: #1A2E23; color: white; }
+    .btn-waitlist {
+      padding: 15px 32px; background: var(--green); color: white;
+      border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: all .22s; font-family: inherit;
+    }
+    .btn-waitlist:hover { background: var(--green-mid); transform: translateY(-1px); box-shadow: 0 8px 28px rgba(11,110,79,.35); }
+    .form-trust { font-size: 12px; color: rgba(255,255,255,.3); margin-top: 8px; }
+    .form-success {
+      display: none; padding: 24px; background: rgba(26,155,108,.12);
+      border: 1px solid rgba(26,155,108,.3); border-radius: var(--radius);
+      color: #7DEBB8; text-align: center; font-size: 15px; font-weight: 500;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #060E09; padding: 48px 5% 32px;
+      border-top: 1px solid rgba(255,255,255,.04);
+    }
+    .footer-inner { max-width: 1120px; margin: 0 auto; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 32px; }
+    .footer-brand { max-width: 300px; }
+    .footer-tagline { font-size: 13px; color: rgba(255,255,255,.35); margin-top: 10px; line-height: 1.6; }
+    .footer-links { display: flex; gap: 64px; flex-wrap: wrap; }
+    .footer-col h4 { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.6); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,.35); text-decoration: none; margin-bottom: 10px; transition: color .2s; }
+    .footer-col a:hover { color: rgba(255,255,255,.7); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.05); padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 13px; color: rgba(255,255,255,.2); }
+    .footer-legal { display: flex; gap: 24px; }
+    .footer-legal a { font-size: 13px; color: rgba(255,255,255,.2); text-decoration: none; }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .nav-mobile-btn { display: flex; }
+      .hero { padding: 90px 20px 64px; }
+      .hero-stats { gap: 20px; }
+      .hero-divider { display: none; }
+      section { padding: 64px 20px; }
+      .steps-grid { grid-template-columns: 1fr; gap: 32px; }
+      .steps-grid::before { display: none; }
+      .diff-grid { grid-template-columns: 1fr; }
+      .form-row { flex-direction: column; }
+      .footer-top { flex-direction: column; }
+      .footer-links { gap: 32px; }
+      .cats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">
+      <img src="asset/logo-symbol.png" alt="Próximo Logo" />
+    </div>
+    <span class="nav-logo-name">Próximo</span>
+  </a>
+  <div class="nav-links">
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#categorias">Categorias</a>
+    <a href="#para-voce">Para você</a>
+    <a href="#waitlist" class="nav-cta">Entrar na lista →</a>
+  </div>
+  <button class="nav-mobile-btn" aria-label="Menu" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-eyebrow">
+    <span></span> Em breve no Vale do Paraíba · Seja o primeiro a saber
+  </div>
+  <h1>O talento da<br/><em>sua cidade</em>,<br/>na palma da mão</h1>
+  <p class="hero-sub">
+    Eletricistas, costureiras, professores, cozinheiros e dezenas de profissionais do interior — encontrados em segundos, com avaliações reais de vizinhos.
+  </p>
+  <div class="hero-ctas">
+    <a href="#waitlist" class="btn-primary" onclick="setToggle('prestador')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Sou prestador de serviço
+    </a>
+    <a href="#waitlist" class="btn-secondary" onclick="setToggle('contratante')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Preciso de um serviço
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val">R$180bi</div>
+      <div class="hero-stat-label">serviços informais/ano no BR</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">1.200+</div>
+      <div class="hero-stat-label">cidades sem marketplace local</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">67M</div>
+      <div class="hero-stat-label">trabalhadores informais no BR</div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>Conheça</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="problema" id="problema">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">O Problema</div>
+      <h2 class="section-title">Um mercado gigante que ninguém resolveu</h2>
+      <p class="section-sub">Enquanto apps nacionais brigam por São Paulo e Rio, o interior do Brasil ficou para trás — sem ferramentas, sem visibilidade.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card reveal">
+        <div class="pain-icon">🔍</div>
+        <h3>Quem precisa perde horas</h3>
+        <p>Encontrar um bom profissional na cidade depende de <span class="pain-highlight">grupos de WhatsApp e boca a boca</span>. Zero garantia, zero agilidade.</p>
+      </div>
+      <div class="pain-card reveal reveal-delay-1">
+        <div class="pain-icon">😔</div>
+        <h3>Talentos invisíveis</h3>
+        <p>Eletricistas, costureiras e professores do interior <span class="pain-highlight">dependem de indicações aleatórias</span> e nunca constroem uma reputação digital.</p>
+      </div>
+      <div class="pain-card reveal reveal-delay-2">
+        <div class="pain-icon">🗺️</div>
+        <h3>Apps nacionais ignoram o interior</h3>
+        <p>GetNinjas, Workana e similares <span class="pain-highlight">foram feitos para capitais</span> e perfis digitais. Sua cidade não existe para eles.</p>
+      </div>
+      <div class="pain-card reveal reveal-delay-3">
+        <div class="pain-icon">💸</div>
+        <h3>Dinheiro circulando sem sistema</h3>
+        <p>Bilhões em serviços locais acontecem sem rastreabilidade, avaliação ou segurança — <span class="pain-highlight">tanto para quem contrata quanto para quem executa.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como-funciona">
+  <div class="container">
+    <div class="section-header center">
+      <div class="section-label">Como funciona</div>
+      <h2 class="section-title">Simples assim</h2>
+      <p class="section-sub">Do problema ao profissional em menos de 3 minutos.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h3>Busque o que precisa</h3>
+        <p>Digite o serviço e sua cidade. O Próximo mostra profissionais reais, avaliados por vizinhos, ordenados por proximidade.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">2</div>
+        <h3>Veja o perfil e avaliações</h3>
+        <p>Cada profissional tem portfólio, estrelas, histórico de serviços e verificação de identidade. Você decide com segurança.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">3</div>
+        <h3>Contrate com 1 toque</h3>
+        <p>Chame pelo chat do app ou pelo WhatsApp. Agende, combine o valor e avalie depois. Simples, direto, sem complicação.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIAS -->
+<section class="categorias" id="categorias">
+  <div class="container">
+    <div class="section-header center">
+      <div class="section-label">Categorias</div>
+      <h2 class="section-title" style="color:white">Qualquer talento,<br/>em qualquer cidade</h2>
+      <p class="section-sub" style="color:rgba(255,255,255,.5)">Do reparo rápido ao serviço especializado — o Próximo tem o profissional certo para você.</p>
+    </div>
+    <div class="cats-grid reveal">
+      <div class="cat-card"><div class="cat-icon">🔌</div><div class="cat-name">Elétrica</div><div class="cat-count">instalações, reparos</div></div>
+      <div class="cat-card"><div class="cat-icon">🔧</div><div class="cat-name">Hidráulica</div><div class="cat-count">encanamento, vazamentos</div></div>
+      <div class="cat-card"><div class="cat-icon">🧵</div><div class="cat-name">Costura</div><div class="cat-count">ajustes, criação</div></div>
+      <div class="cat-card"><div class="cat-icon">🎓</div><div class="cat-name">Aulas</div><div class="cat-count">reforço, idiomas, música</div></div>
+      <div class="cat-card"><div class="cat-icon">🍳</div><div class="cat-name">Culinária</div><div class="cat-count">marmitas, eventos, cursos</div></div>
+      <div class="cat-card"><div class="cat-icon">🌿</div><div class="cat-name">Jardinagem</div><div class="cat-count">manutenção, paisagismo</div></div>
+      <div class="cat-card"><div class="cat-icon">🎨</div><div class="cat-name">Pintura</div><div class="cat-count">paredes, fachadas, arte</div></div>
+      <div class="cat-card"><div class="cat-icon">🐾</div><div class="cat-name">Pet Care</div><div class="cat-count">banho, tosa, passeio</div></div>
+      <div class="cat-card"><div class="cat-icon">💇</div><div class="cat-name">Beleza</div><div class="cat-count">cabelo, unhas, estética</div></div>
+      <div class="cat-card"><div class="cat-icon">🏠</div><div class="cat-name">Limpeza</div><div class="cat-count">residencial, pós-obra</div></div>
+      <div class="cat-card"><div class="cat-icon">📸</div><div class="cat-name">Fotografia</div><div class="cat-count">eventos, retratos</div></div>
+      <div class="cats-more"><span>+ 40 categorias →</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS -->
+<section id="para-voce">
+  <div class="container">
+    <div class="diff-grid">
+      <div>
+        <div class="section-label">Por que o Próximo</div>
+        <h2 class="section-title">Construído para gerar confiança real</h2>
+        <p class="section-sub" style="margin-bottom: 40px">Não somos mais um marketplace genérico. Cada detalhe foi pensado para o contexto do interior brasileiro.</p>
+        <div class="diff-list">
+          <div class="diff-item reveal">
+            <div class="diff-item-icon">📍</div>
+            <div>
+              <h3>Hiperlocal de verdade</h3>
+              <p>Busca por bairro e cidade com GPS. Você vê profissionais a metros de distância, não em outra cidade.</p>
+            </div>
+          </div>
+          <div class="diff-item reveal reveal-delay-1">
+            <div class="diff-item-icon">✅</div>
+            <div>
+              <h3>Verificação de identidade</h3>
+              <p>Prestadores verificados têm documento conferido. Você sabe exatamente com quem está lidando.</p>
+            </div>
+          </div>
+          <div class="diff-item reveal reveal-delay-2">
+            <div class="diff-item-icon">⭐</div>
+            <div>
+              <h3>Avaliações de vizinhos</h3>
+              <p>Reputação construída por pessoas da sua cidade — não por robôs ou perfis falsos de capitais.</p>
+            </div>
+          </div>
+          <div class="diff-item reveal reveal-delay-3">
+            <div class="diff-item-icon">💳</div>
+            <div>
+              <h3>Zero taxa para começar</h3>
+              <p>Qualquer prestador pode se cadastrar e receber contatos gratuitamente. Começamos juntos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="diff-visual">
+          <div class="profile-mock">
+            <div class="profile-header">
+              <div class="profile-avatar">M</div>
+              <div>
+                <div class="profile-name">Maria Aparecida Silva</div>
+                <div class="profile-role">Costureira · Guaratinguetá, SP</div>
+                <div class="verified-badge">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Identidade verificada
+                </div>
+              </div>
+            </div>
+            <div class="stars">★★★★★</div>
+            <div class="reviews">4.9 · 63 avaliações de clientes</div>
+            <div class="profile-stats">
+              <div class="pstat"><div class="pstat-val">63</div><div class="pstat-lbl">avaliações</div></div>
+              <div class="pstat"><div class="pstat-val">98%</div><div class="pstat-lbl">responde</div></div>
+              <div class="pstat"><div class="pstat-val">8 anos</div><div class="pstat-lbl">experiência</div></div>
+            </div>
+            <div style="font-size:13px;color:#3D5A4A;line-height:1.5;margin-top:4px">"Faço ajustes, criação sob medida e bordados. Atendo em domicílio no centro e bairros próximos."</div>
+            <button class="btn-hire">Entrar em contato →</button>
+          </div>
+          <div style="margin-top:16px;padding:14px;background:var(--green-pale);border-radius:10px;font-size:13px;color:var(--green);font-weight:500;display:flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            Este é o tipo de perfil que você vai encontrar no Próximo.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST / FORM -->
+<section class="waitlist" id="waitlist">
+  <div class="waitlist-inner">
+    <div class="section-label" style="color:#7DEBB8;text-align:center">Lista de espera</div>
+    <h2>Entre na lista.<br/>Seja o <em>primeiro</em>.</h2>
+    <p>Estamos chegando no Vale do Paraíba em breve. Cadastre-se agora e ganhe acesso antecipado, sem custo.</p>
+
+    <div id="form-area">
+      <div class="form-type-toggle">
+        <button class="toggle-btn active" id="btn-prestador" onclick="setToggle('prestador')">Sou prestador de serviço</button>
+        <button class="toggle-btn" id="btn-contratante" onclick="setToggle('contratante')">Preciso de serviço</button>
+      </div>
+      <form class="waitlist-form" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <input class="form-input" type="text" name="name" placeholder="Seu nome completo" required />
+        </div>
+        <div class="form-row">
+          <input class="form-input" type="email" name="email" placeholder="seu@email.com" required />
+          <input class="form-input" type="tel" name="phone" placeholder="(12) 99999-9999" style="max-width:180px" />
+        </div>
+        <div class="form-row">
+          <input class="form-input" type="text" name="city" placeholder="Sua cidade (ex: Guaratinguetá)" required />
+          <select class="form-select" name="category" id="category-select" onchange="handleCategoryChange(event)">
+            <option value="">Área de atuação</option>
+            <option value="Elétrica">Elétrica</option><option value="Hidráulica">Hidráulica</option><option value="Costura">Costura</option>
+            <option value="Aulas particulares">Aulas particulares</option><option value="Culinária">Culinária</option><option value="Jardinagem">Jardinagem</option>
+            <option value="Pintura">Pintura</option><option value="Limpeza">Limpeza</option><option value="Beleza">Beleza</option>
+            <option value="Fotografia">Fotografia</option><option value="Pet Care">Pet Care</option><option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-row" id="category-custom-row" style="display: none;">
+          <input class="form-input" type="text" name="category_custom" id="category-custom" placeholder="Qual sua área de atuação?" />
+        </div>
+        <button type="submit" class="btn-waitlist">Quero acesso antecipado →</button>
+        <p class="form-trust">🔒 Seus dados são privados. Sem spam. Cancelamento com 1 clique.</p>
+      </form>
+      <div class="form-success" id="form-success">
+        ✅ Cadastro confirmado! Em breve você vai receber o acesso antecipado ao Próximo.<br/>
+        <span style="font-size:13px;opacity:.7;margin-top:6px;display:block">Compartilhe com um prestador que você conhece 👇</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="margin-bottom:12px">
+          <div class="nav-logo-mark">
+            <img src="asset/logo-symbol.png" alt="Próximo Logo" />
+          </div>
+          <span class="nav-logo-name">Próximo</span>
+        </a>
+        <p class="footer-tagline">O marketplace hiperlocal que conecta talentos do interior do Brasil com quem precisa deles.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Produto</h4>
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#categorias">Categorias</a>
+          <a href="#para-voce">Diferenciais</a>
+          <a href="#waitlist">Lista de espera</a>
+        </div>
+        <div class="footer-col">
+          <h4>Para prestadores</h4>
+          <a href="#waitlist">Cadastre seu perfil</a>
+          <a href="#">Perfil verificado</a>
+          <a href="#">Dicas para se destacar</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <a href="mailto:oi@proximo.app">oi@proximo.app</a>
+          <a href="#">Instagram</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Próximo Tecnologia Ltda. Todos os direitos reservados.</span>
+      <div class="footer-legal">
+        <a href="#">Privacidade</a>
+        <a href="#">Termos</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // Form toggle
+  function setToggle(type) {
+    document.getElementById('btn-prestador').classList.toggle('active', type === 'prestador');
+    document.getElementById('btn-contratante').classList.toggle('active', type === 'contratante');
+    const sel = document.getElementById('category-select');
+    const customRow = document.getElementById('category-custom-row');
+    
+    if (type === 'prestador') {
+      sel.style.display = 'block';
+      if (sel.value === 'Outro') {
+        customRow.style.display = 'flex';
+      }
+    } else {
+      sel.style.display = 'none';
+      if (customRow) customRow.style.display = 'none';
+    }
+  }
+  setToggle('prestador');
+
+  // Category select logic
+  function handleCategoryChange(e) {
+    const customRow = document.getElementById('category-custom-row');
+    const customInput = document.getElementById('category-custom');
+    if (e.target.value === 'Outro') {
+      customRow.style.display = 'flex';
+      customInput.required = true;
+      customInput.focus();
+    } else {
+      customRow.style.display = 'none';
+      customInput.required = false;
+      customInput.value = '';
+    }
+  }
+
+  // Form submit
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Enviando...';
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    // Determine user_type
+    data.user_type = document.getElementById('btn-prestador').classList.contains('active') ? 'provider' : 'client';
+    
+    // Handle category if 'Outro'
+    if (data.category === 'Outro' && data.category_custom) {
+      data.category = data.category_custom;
+    }
+    delete data.category_custom;
+
+    try {
+      const res = await fetch('http://localhost:3001/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      const result = await res.json();
+      
+      if (!res.ok) {
+        alert(result.error || 'Erro ao realizar cadastro.');
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Quero acesso antecipado →';
+        return;
+      }
+      
+      document.getElementById('form-area').querySelector('form').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    } catch (err) {
+      alert('Erro de conexão com o servidor.');
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Quero acesso antecipado →';
+      console.error(err);
+    }
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) { el.target.classList.add('visible'); observer.unobserve(el.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
